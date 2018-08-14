@@ -30,6 +30,11 @@ class test_hqCommonProblem(unittest.TestCase):
     base_url = localReadConfig.get_string('base_url', 'hq_url')
     s = requests.session()
 
+
+
+    '''
+        帮助中心
+    '''
     def test_hq_common_problem(self):
         try:
             start_num = 1
@@ -37,11 +42,7 @@ class test_hqCommonProblem(unittest.TestCase):
             file_name = '..//testFile//common_problem.xls'
             hq_common_problem_url = self.localReadConfig.get_string('url','hq_common_problem_url')
             last_url = self.base_url + hq_common_problem_url
-            r = self.s.get(
-                self.base_url + self.url,
-                headers = json.loads(self.localReadConfig.get_string('data','headers')),
-                cookies = json.loads(self.localReadConfig.get_string('data','cookies'))
-            )
+            r = common.common.getLoginState(self.base_url + self.url)
             xlsList = common.common.get_excel(start_num, end_num, file_name)
             if xlsList != [] :
                 for i in xlsList :
@@ -63,4 +64,4 @@ class test_hqCommonProblem(unittest.TestCase):
     def tearDown(self):
         print("end test")
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(warnings='ignore')

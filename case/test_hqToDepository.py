@@ -26,30 +26,32 @@ class test_hqToDepository(unittest.TestCase):
 
     localReadConfig = readConfig.ReadConfig()
 
-    headers = {'Content-Type': 'application/json;charset=UTF-8'}
-    cookies = {'session': 'b39c525e282a41d59cc27eded1d3f18a'}
     url = localReadConfig.get_string("url", 'hq_login_url')
     base_url = localReadConfig.get_string('base_url', 'hq_url')
     s = requests.session()
 
+
+    '''
+        存管
+    '''
     def test_hq_to_depository(self):
         try:
             hq_to_depository_url = self.localReadConfig.get_string('url','hq_to_depository_url')
             last_url = self.base_url + hq_to_depository_url
-            r = self.s.get(
-                self.base_url + self.url,
-                headers = self.headers,
-                cookies = self.cookies
-            )
-            r = self.s.post(last_url,json={"back_url_address": "https://jr.huanqiu.com/h5/user/"})
+            r = common.common.getLoginState(self.base_url + self.url)
+            r = self.s.post(last_url,json={"back_url_address": "https://jr.huanqiu.com/h5/user/"},cookies = r.cookies)
             json_dict = json.loads(r.text)
-            status_code = str(r.status_code)
+            status_code = r.status_code
             if type(json_dict).__name__ == 'dict':
-                logs.Log.Log().getInstance(last_url + ' | POST | ' + status_code + ' | ' + str(json_dict['return_msg']))
+                self.assertTrue(status_code == 200)
+                logs.Log.Log().getInstance(last_url + ' | POST | ' + str(status_code) + ' | ' + str(json_dict['return_msg']))
             else:
-                logs.Log.Log().getInstance(last_url + ' | ' + status_code + ' | ' + str(r.text))
+                logs.Log.Log().getInstance(last_url + ' | ' + str(status_code) + ' | ' + str(r.text))
         except Exception as ex:
             logs.Log.Log().getInstance(str(ex))
 
     def tearDown(self):
         print("end test")
+
+if __name__ == '__main__':
+    unittest.main(warnings='ignore')

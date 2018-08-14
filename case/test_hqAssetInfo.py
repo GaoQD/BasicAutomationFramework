@@ -38,11 +38,7 @@ class test_hqAssetInfo(unittest.TestCase):
             file_name = '..//testFile//asset_info.xls'
             hq_asset_info_url = self.localReadConfig.get_string('url','hq_asset_info_url')
             last_url = self.base_url + hq_asset_info_url
-            r = self.s.get(
-                self.base_url + self.url,
-                headers = json.loads(self.localReadConfig.get_string('data','headers')),
-                cookies = json.loads(self.localReadConfig.get_string('data','cookies'))
-            )
+            r = common.common.getLoginState(self.base_url + self.url)
             xlsList = common.common.get_excel(start_num, end_num, file_name)
             prdIdList = test_hqProductCunguan.test_hq_product_cunguan(self)
             if prdIdList != [] and xlsList != []:
@@ -73,4 +69,4 @@ class test_hqAssetInfo(unittest.TestCase):
         print("end test")
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(warnings='ignore')

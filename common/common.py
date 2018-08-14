@@ -1,10 +1,10 @@
 # coding:utf-8
 
-import os
 import xlrd
-from xml.etree import ElementTree as ElementTree
 from xlutils.copy import copy
-
+import requests
+import config.readConfig as readConfig
+import json
 
 #写入excel
 def modify_excel(num,result_des,file_name):
@@ -34,40 +34,26 @@ def get_excel(start_num,end_num,file_name):
             rowValues = sheet.row_values(j)
             caseDict = dict(zip(titleList, rowValues))
             cls.append(caseDict)
-    print(cls)
     return cls
 
-database = {}
-def set_xml():
-    if len(database) == 0 :
-        sql_path = os.path.join('..//testFile','SQL.xml')
-        tree = ElementTree.parse(sql_path)
-        for db in tree.findall('database'):
-            db_name = db.get('name')
-            table = {}
-            for tb in db.getchildren():
-                table_name = tb.get('name')
-                sql = {}
-                for data in tb.getchildren():
-                    sql_id = data.get('id')
-                    sql[sql_id] = data.text
-                table[table_name] = sql
-            database[db_name] = table
+'''
+    创建并返回登录session
+    注意：
+        不管是get还是post方法，都需要传递cookies参数
+'''
+def getLoginState(url):
+    s = requests.session()
+    r = s.get(
+        url,
+        headers = json.loads(readConfig.ReadConfig().get_string('data','headers')),
+        cookies = json.loads(readConfig.ReadConfig().get_string('data','cookies'))
+    )
+    return r
 
-
-def get_xml_dict(database_name,table_name):
-    set_xml()
-    database_dict = database.get(database_name).get(table_name)
-    return database_dict
-
-def get_sql(database_name,table_name,sql_id):
-    db = get_xml_dict(database_name,table_name)
-    sql = db.get(sql_id)
-    return sql
-
-if __name__ == '__main__':
-    file_name = '..//testFile//test.xls'
-    num = 1
-    end_num = 6
-    get_excel(num,end_num,file_name)
-    # modify_excel(num,'PASS',file_name)
+# if __name__ == '__main__':
+#     url = 'https://jr.huanqiu.com/api/financial/login'
+#     r = getLoginState(url)
+#     print(r.cookies)
+#     # r = requests.session().post('https://jr.huanqiu.com/api/financial/real_name',json={"id_name": "高强德","id_card": "620421199107176437"},cookies = r.cookies)
+#     r = requests.session().get('https://jr.huanqiu.com/api/financial/product_record?sort=create_at&page=0&prd_id=170712110125149')
+#     print(r)

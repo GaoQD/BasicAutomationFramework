@@ -31,18 +31,17 @@ class test_hqQueryBalance(unittest.TestCase):
     base_url = localReadConfig.get_string('base_url', 'hq_url')
     s = requests.session()
 
+
+    '''
+        
+    '''
     def test_hq_query_balance(self):
         try:
             hq_query_balance_url = self.localReadConfig.get_string('url','hq_query_balance_url')
             last_url = self.base_url + hq_query_balance_url
-            r = self.s.get(
-                self.base_url + self.url,
-                headers = json.loads(self.localReadConfig.get_string('data','headers')),
-                cookies = json.loads(self.localReadConfig.get_string('data','cookies'))
-            )
-            r = self.s.get(last_url)
+            r = common.common.getLoginState(self.base_url + self.url)
+            r = self.s.get(last_url,cookies = r.cookies)
             json_dict = json.loads(r.text)
-            print(json_dict)
             status_code = r.status_code
             if type(json_dict).__name__ == 'dict':
                 self.assertTrue(status_code == 200)
@@ -56,4 +55,4 @@ class test_hqQueryBalance(unittest.TestCase):
         print("end test")
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(warnings='ignore')

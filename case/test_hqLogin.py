@@ -26,20 +26,26 @@ class test_hqLogin(unittest.TestCase):
 
     localReadConfig = readConfig.ReadConfig()
 
-    headers = {'Content-Type': 'application/json;charset=UTF-8'}
-    cookies = {'session': 'b39c525e282a41d59cc27eded1d3f18a'}
     url = localReadConfig.get_string("url", 'hq_login_url')
     base_url = localReadConfig.get_string('base_url', 'hq_url')
     s = requests.session()
 
+
+    '''
+        登录接口
+    '''
     def test_hq_login(self):
         try:
             last_url = self.base_url + self.url
-            print(last_url)
-            r = self.s.post(last_url,headers = self.headers,cookies = self.cookies,json={"mobile":"19994334819","password":"eQ/qLSlDIuLT44ieOUz/E2/6czAkzmbYxLl6hDhlILa73kAzdTil87Y5m0hsKsh9GpcT/JM8kUVHTBMP9l3nEZoZROFRDlIcDbD2DQS5hgw6AZ9ehYcnPuqoNiYDqt0lfdt5DG0je2Snzoa6/+hbgXo63X5uumDTGlsuX4W9bMw=","type":"password"})
+            r = self.s.post(
+                last_url,
+                # json={"mobile":"19994334819","password":"eQ/qLSlDIuLT44ieOUz/E2/6czAkzmbYxLl6hDhlILa73kAzdTil87Y5m0hsKsh9GpcT/JM8kUVHTBMP9l3nEZoZROFRDlIcDbD2DQS5hgw6AZ9ehYcnPuqoNiYDqt0lfdt5DG0je2Snzoa6/+hbgXo63X5uumDTGlsuX4W9bMw=","type":"password"}
+                json={"mobile": "18298380158","password":"NUprIrkuaVgHAz9kGs+FqWy8gmNSA0wVRb96kpN1wzc+KOhTCiE5zaMXwsAeIRXN/9RAkl+IczVnVABAR0bjmK8Fr+Mw/TW4tsnKHGiIzsLboyAljFezroUEz0OusD+T0wO5/G3gVX9H5eJ8hXH40aP6zeYV90HArEfUcYx03J4=","type":"password"}
+            )
             status_code = str(r.status_code)
             if 'status' in r.text:
                 json_dict = json.loads(r.text)
+
                 status = json_dict['status']
                 if type(json_dict).__name__ == 'dict':
                     logs.Log.Log().getInstance(last_url + ' | POST | ' + status_code + ' | ' + str(json_dict['data']))
@@ -49,6 +55,9 @@ class test_hqLogin(unittest.TestCase):
                 logs.Log.Log().getInstance(last_url + ' | ' + status_code)
         except Exception as ex:
             logs.Log.Log().getInstance(str(ex))
+
     def tearDown(self):
         print("end test")
 
+if __name__ == '__main__':
+    unittest.main(warnings='ignore')

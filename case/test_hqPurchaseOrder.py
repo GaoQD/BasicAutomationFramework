@@ -31,17 +31,17 @@ class test_hqPurchaseOrder(unittest.TestCase):
     base_url = localReadConfig.get_string('base_url', 'hq_url')
     s = requests.session()
 
+
+    '''
+        订单确认
+    '''
     def test_hq_purchase_order(self):
         try:
             hq_purchase_order_url = self.localReadConfig.get_string('url','hq_purchase_order_url')
             last_url = self.base_url + hq_purchase_order_url
-            r = self.s.get(
-                self.base_url + self.url,
-                headers = json.loads(self.localReadConfig.get_string('data','headers')),
-                cookies = json.loads(self.localReadConfig.get_string('data','cookies'))
-            )
+            r = common.common.getLoginState(self.base_url + self.url)
             jsonData = {"prd_id":"170712110124850","amount": "111.00", "user_continue": "B03"}
-            r = self.s.post(last_url,json=jsonData)
+            r = self.s.post(last_url,json=jsonData,cookies = r.cookies)
             json_dict = json.loads(r.text)
             status_code = r.status_code
             if type(json_dict).__name__ == 'dict':
@@ -55,4 +55,4 @@ class test_hqPurchaseOrder(unittest.TestCase):
     def tearDown(self):
         print("end test")
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(warnings='ignore')

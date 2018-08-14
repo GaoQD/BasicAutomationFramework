@@ -26,22 +26,25 @@ class test_hqRecharge(unittest.TestCase):
 
     localReadConfig = readConfig.ReadConfig()
 
-    headers = {'Content-Type': 'application/json;charset=UTF-8'}
-    cookies = {'session': 'b39c525e282a41d59cc27eded1d3f18a'}
     url = localReadConfig.get_string("url", 'hq_login_url')
     base_url = localReadConfig.get_string('base_url', 'hq_url')
     s = requests.session()
 
+
+    '''
+        充值
+    '''
     def test_hq_recharge(self):
         try:
             hq_recharge_url = self.localReadConfig.get_string('url','hq_recharge_url')
             last_url = self.base_url + hq_recharge_url
-            r = self.s.get(
-                self.base_url + self.url,
-                headers = self.headers,
-                cookies = self.cookies
-            )
-            r = self.s.get(last_url)
+            # r = self.s.get(
+            #     self.base_url + self.url,
+            #     headers = self.headers,
+            #     cookies = self.cookies
+            # )
+            r = common.common.getLoginState(self.base_url + self.url)
+            r = self.s.get(last_url,cookies = r.cookies)
             json_dict = json.loads(r.text)
             status_code = str(r.status_code)
             if type(json_dict).__name__ == 'dict':
@@ -53,3 +56,6 @@ class test_hqRecharge(unittest.TestCase):
 
     def tearDown(self):
         print("end test")
+
+if __name__ == '__main__':
+    unittest.main(warnings='ignore')

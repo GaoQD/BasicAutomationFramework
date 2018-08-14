@@ -32,16 +32,17 @@ class test_hqProfile(unittest.TestCase):
     base_url = localReadConfig.get_string('base_url', 'hq_url')
     s = requests.session()
 
+
+
+    '''
+        个人中心
+    '''
     def test_hq_profile(self):
         try:
             hq_profile_url = self.localReadConfig.get_string('url','hq_profile_url')
             last_url = self.base_url + hq_profile_url
-            r = self.s.get(
-                self.base_url + self.url,
-                headers = self.headers,
-                cookies = self.cookies
-            )
-            r = self.s.get(last_url)
+            r = common.common.getLoginState(self.base_url + self.url)
+            r = self.s.get(last_url,cookies = r.cookies)
             status_code = str(r.status_code)
             json_dict = json.loads(r.text)
             if type(json_dict).__name__ == 'dict':
@@ -53,3 +54,5 @@ class test_hqProfile(unittest.TestCase):
     def tearDown(self):
         print("end test")
 
+if __name__ == '__main__':
+    unittest.main(warnings='ignore')

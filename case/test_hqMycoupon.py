@@ -30,6 +30,11 @@ class test_hqMycoupon(unittest.TestCase):
     base_url = localReadConfig.get_string('base_url', 'hq_url')
     s = requests.session()
 
+
+
+    '''
+        优惠券
+    '''
     def test_hq_mycoupon(self):
         try:
             start_num = 1
@@ -37,15 +42,11 @@ class test_hqMycoupon(unittest.TestCase):
             file_name = '..//testFile//mycoupon.xls'
             hq_mycoupon_url= self.localReadConfig.get_string('url','hq_mycoupon_url')
             last_url = self.base_url + hq_mycoupon_url
-            r = self.s.get(
-                self.base_url + self.url,
-                headers = json.loads(self.localReadConfig.get_string('data','headers')),
-                cookies = json.loads(self.localReadConfig.get_string('data','cookies'))
-            )
+            r = common.common.getLoginState(self.base_url + self.url)
             xlsList = common.common.get_excel(start_num, end_num, file_name)
             if xlsList != [] :
                 for i in xlsList:
-                    r = self.s.get(last_url + i['CaseData'])
+                    r = self.s.get(last_url + i['CaseData'],cookies = r.cookies)
                     status_code = r.status_code
                     if 'Error' not in r.text:
                         json_dict = json.loads(r.text)
@@ -68,4 +69,4 @@ class test_hqMycoupon(unittest.TestCase):
         print("end test")
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(warnings='ignore')

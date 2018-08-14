@@ -26,22 +26,21 @@ class test_hqRiskAssessment(unittest.TestCase):
 
     localReadConfig = readConfig.ReadConfig()
 
-    headers = {'Content-Type': 'application/json;charset=UTF-8'}
-    cookies = {'session': 'b39c525e282a41d59cc27eded1d3f18a'}
     url = localReadConfig.get_string("url", 'hq_login_url')
     base_url = localReadConfig.get_string('base_url', 'hq_url')
     s = requests.session()
+
+
+    '''
+        风险评测
+    '''
 
     def test_hq_risk_assessment(self):
         try:
             hq_risk_assessment_url = self.localReadConfig.get_string('url','hq_risk_assessment_url')
             last_url = self.base_url + hq_risk_assessment_url
-            r = self.s.get(
-                self.base_url + self.url,
-                headers = self.headers,
-                cookies = self.cookies
-            )
-            r = self.s.get(last_url)
+            r = common.common.getLoginState(self.base_url + self.url)
+            r = self.s.get(last_url,cookies = r.cookies)
             status_code = str(r.status_code)
             json_dict = json.loads(r.text)
             if type(json_dict).__name__ == 'dict':
@@ -54,4 +53,5 @@ class test_hqRiskAssessment(unittest.TestCase):
     def tearDown(self):
         print("end test")
 
-
+if __name__ == '__main__':
+    unittest.main(warnings='ignore')

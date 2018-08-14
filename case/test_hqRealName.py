@@ -26,28 +26,38 @@ class test_hqRealName(unittest.TestCase):
 
     localReadConfig = readConfig.ReadConfig()
 
-    headers = {'Content-Type': 'application/json;charset=UTF-8'}
-    cookies = {'session': 'b39c525e282a41d59cc27eded1d3f18a'}
+
     url = localReadConfig.get_string("url", 'hq_login_url')
     base_url = localReadConfig.get_string('base_url', 'hq_url')
     s = requests.session()
 
+
+    '''
+        实名认证
+    '''
     def test_hq_real_name(self):
         try:
+            start_num = 1
+            end_num = 6
+            file_name = '..//testFile//real_name.xls'
             hq_real_name_url = self.localReadConfig.get_string('url','hq_real_name_url')
             last_url = self.base_url +  hq_real_name_url
-            r = self.s.get(
-                self.base_url + self.url,
-                headers = self.headers,
-                cookies = self.cookies
-            )
-            r = self.s.post(last_url,json={"id_name": "高强德","id_card": "620421199107176437"})
-            json_dict = json.loads(r.text)
-            status_code = str(r.status_code)
-            if type(json_dict).__name__ == 'dict':
-                logs.Log.Log().getInstance(last_url + ' | POST | ' + status_code + ' | ' + str(json_dict['return_msg']))
+            '''
+                获取session信息
+            '''
+            r = common.common.getLoginState(self.base_url + self.url)
+            xlsList = common.common.get_excel(start_num, end_num, file_name)
+            if xlsList != []:
+                for i in xlsList:
+                    r = self.s.post(last_url,json=json.loads(i["CaseData"]),cookies = r.cookies)
+                    json_dict = json.loads(r.text)
+                    status_code = str(r.status_code)
+                    if type(json_dict).__name__ == 'dict':
+                        logs.Log.Log().getInstance(last_url + ' | POST | ' + status_code + ' | ' + str(json_dict['return_msg']))
+                    else:
+                        logs.Log.Log().getInstance(last_url + ' | ' + status_code + ' | ' + str(r.text))
             else:
-                logs.Log.Log().getInstance(last_url + ' | ' + status_code + ' | ' + str(r.text))
+                logs.Log.Log().getInstance(last_url + ' | not found case')
         except Exception as ex:
             logs.Log.Log().getInstance(str(ex))
 
@@ -55,3 +65,5 @@ class test_hqRealName(unittest.TestCase):
     def tearDown(self):
         print("end test")
 
+if __name__ == '__main__':
+    unittest.main(verbosity=2,warnings='ignore')

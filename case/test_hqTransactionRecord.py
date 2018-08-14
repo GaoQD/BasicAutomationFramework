@@ -30,24 +30,36 @@ class test_hqTransactionRecord(unittest.TestCase):
     base_url = localReadConfig.get_string('base_url', 'hq_url')
     s = requests.session()
 
+    '''
+        交易记录
+    '''
     def test_hq_transaction_record(self):
         try:
+            file_name = '..//testFile//transaction_record.xls'
+            start_num = 1
+            end_num = 9
             hq_transaction_record_url = self.localReadConfig.get_string('url','hq_transaction_record_url')
             last_url = self.base_url + hq_transaction_record_url
-            r = self.s.get(
-                self.base_url + self.url,
-                headers = json.loads(self.localReadConfig.get_string('data','headers')),
-                cookies = json.loads(self.localReadConfig.get_string('data','cookies'))
-            )
-            r = self.s.get(last_url)
-            json_dict = json.loads(r.text)
-            print(json_dict)
-            status_code = r.status_code
-            if type(json_dict).__name__ == 'dict':
-                self.assertTrue(status_code == 200)
-                logs.Log.Log().getInstance(last_url + ' | GET | ' + str(status_code) + ' | ' + str(json_dict['return_code']))
+            r = common.common.getLoginState(self.base_url + self.url)
+            xlsList = common.common.get_excel(start_num, end_num, file_name)
+            if xlsList != []:
+                for i in xlsList :
+                    r = self.s.get(last_url + i['CaseData'],cookies = r.cookies)
+                    status_code = r.status_code
+                    if 'Error' not in r.text :
+                        json_dict = json.loads(r.text)
+                        if type(json_dict).__name__ == 'dict':
+                            self.assertTrue(status_code == 200)
+                            logs.Log.Log().getInstance(last_url + i['CaseData'] + ' | GET | ' + str(status_code) + ' | ' + str(json_dict['return_code']))
+                            common.common.modify_excel(int(i['CaseNO']),'PASS',file_name)
+                        else:
+                            logs.Log.Log().getInstance(last_url + i['CaseData'] + ' | ' + str(status_code))
+                            common.common.modify_excel(int(i['CaseNO']),'FAIL',file_name)
+                    else:
+                        logs.Log.Log().getInstance(last_url + i['CaseData'] + ' | ' + str(status_code))
+                        common.common.modify_excel(int(i['CaseNO']),'FAIL',file_name)
             else:
-                logs.Log.Log().getInstance(last_url + ' | ' + str(status_code))
+                logs.Log.Log().getInstance(last_url + ' | case not found')
         except Exception as ex:
             logs.Log.Log().getInstance(str(ex))
 
@@ -55,4 +67,4 @@ class test_hqTransactionRecord(unittest.TestCase):
         print("end test")
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(warnings='ignore')

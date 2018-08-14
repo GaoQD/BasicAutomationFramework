@@ -35,17 +35,13 @@ class test_hqDepositoryFlow(unittest.TestCase):
         try:
             hq_depository_flow_url = self.localReadConfig.get_string('url','hq_depository_flow_url')
             last_url = self.base_url + hq_depository_flow_url
-            r = self.s.get(
-                self.base_url + self.url,
-                headers = json.loads(self.localReadConfig.get_string('data','headers')),
-                cookies = json.loads(self.localReadConfig.get_string('data','cookies'))
-            )
+            r = common.common.getLoginState(self.base_url + self.url)
             jsonData = {}
             prdIdList = test_hqProductCunguan.test_hq_product_cunguan(self)
             if prdIdList != [] :
                 for prd_id in prdIdList:
                     jsonData['prd_id'] = prd_id
-                    r = self.s.post(last_url,json=jsonData)
+                    r = self.s.post(last_url,json=jsonData,cookies = r.cookies)
                     json_dict = json.loads(r.text)
                     status_code = r.status_code
                     if type(json_dict).__name__ == 'dict':
@@ -61,4 +57,4 @@ class test_hqDepositoryFlow(unittest.TestCase):
     def tearDown(self):
         print("end test")
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(warnings='ignore')
