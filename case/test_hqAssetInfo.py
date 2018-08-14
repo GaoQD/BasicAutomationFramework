@@ -45,7 +45,7 @@ class test_hqAssetInfo(unittest.TestCase):
                 for prd_id in prdIdList:
                     for i in xlsList:
                         url = last_url + i['CaseData'] + '&prd_id=' + prd_id
-                        r = self.s.get(url)
+                        r = self.s.get(url,cookies = r.cookies)
                         status_code = r.status_code
                         if 'invalid' not in r.text :
                             json_dict = json.loads(r.text)
